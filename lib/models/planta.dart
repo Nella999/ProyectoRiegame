@@ -31,7 +31,7 @@ class Planta {
       nombre: map['nombre'] ?? '',
       apodo: map['apodo'] ?? '',
       observaciones: map['observaciones'] ?? '',
-        frecuenciaDias: map['frecuenciaDias'] ?? 0,
+      frecuenciaDias: map['frecuenciaDias'] ?? 0,
     );
   }
 }
