@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; //Agregando imports
+import '../models/planta.dart';
+import '../services/firestore_service.dart';
 import 'registrar_planta.dart';
 
 class Inicio extends StatelessWidget {
-  const Inicio({super.key});
+  Inicio({super.key});
+  final FirestoreService firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -10,11 +14,65 @@ class Inicio extends StatelessWidget {
       appBar: AppBar(
         title: const Text("¡Riégame!"),
       ),
-      body: const Center(
-        child: Text(
-          "Aun no registraste tu planta :(",
-          style: TextStyle(fontSize: 20),
-        ),
+
+      // Cuerpo pantalla
+      body: StreamBuilder<QuerySnapshot>(
+        stream: firestoreService.obtenerPlantas(),
+        builder: (context, snapshot) {
+
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Ocurrió un error :("),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final plantas = snapshot.data!.docs;
+          if (plantas.isEmpty) {
+            return const Center(
+              child: Text(
+                "Aún no registraste ninguna planta 🌱",
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
+          //Se agrega automaticamente la planta dps de guardarse
+          return ListView.builder(
+            itemCount: plantas.length,
+            itemBuilder: (context, index) {
+              final planta = Planta.fromMap(
+                plantas[index].data() as Map<String, dynamic>,
+              );
+              return Card(
+                margin: const EdgeInsets.all(10),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.local_florist,
+                    color: Colors.green,
+                  ),
+                  title: Text(planta.nombre),
+                  subtitle: Text(
+                    "Apodo: ${planta.apodo}\n"
+                        "💧 Cada ${planta.frecuenciaDias} días",
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                    onPressed: () async {
+                      await firestoreService.eliminarPlanta(planta.id);
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
