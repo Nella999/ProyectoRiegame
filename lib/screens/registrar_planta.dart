@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
-import '../providers/planta_provider.dart';
+//import '../providers/planta_provider.dart'; ya no se hace uso de este import
+import '../services/firestore_service.dart';
 
 class registrar_planta extends StatefulWidget {
   const registrar_planta({super.key});
@@ -15,6 +16,7 @@ class registrar_plantaState extends State<registrar_planta> {
   final apodoController = TextEditingController();
   final observacionesController = TextEditingController();
   final frecuenciaController = TextEditingController();
+  final FirestoreService firestoreService = FirestoreService(); // Agregando instancia de servicio
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +61,9 @@ class registrar_plantaState extends State<registrar_planta> {
 
             TextField(
               controller: frecuenciaController,
+              keyboardType: TextInputType.number, // Se abre el teclado numerico
               decoration: const InputDecoration(
-                labelText: "Frecuencia de riego",
+                labelText: "Frecuencia de riego en días",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -68,19 +71,34 @@ class registrar_plantaState extends State<registrar_planta> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async  { //Acciones cuando el usuario selecciona algo
 
-                  Planta nuevaPlanta = Planta(
-                    id: DateTime.now().toString(),
+                  //El usuario no puede dejar espacios vacíos
+                  if (nombreController.text.isEmpty || frecuenciaController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Completar los campos obligatorios porfavor"),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Planta newPlanta = Planta(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
                     nombre: nombreController.text,
                     apodo: apodoController.text,
                     observaciones: observacionesController.text,
-                    frecuenciaRiego: frecuenciaController.text,
+                    frecuenciaDias: int.tryParse(frecuenciaController.text) ?? 0, //Modificando el tipo de dato a entero
                   );
 
-                  PlantaProvider.plantas.add(nuevaPlanta);
+                  //PlantaProvider.plantas.add(newPlanta);
+                  await firestoreService.registrarPlanta(newPlanta); //esperar a que termine para continuar
 
-                  print("Plantas registradas: ${PlantaProvider.plantas.length}");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("¡Tu planta se registró correctamente! 🌱"),
+                    ),
+                  );
 
                   Navigator.pop(context);
                 },
