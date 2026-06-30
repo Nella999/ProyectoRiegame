@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; //Agregando imports
 import '../models/planta.dart';
-import '../services/firestore_service.dart';
-import 'registrar_planta.dart';
+import '../services/firestore_service.dart'; // import para llamar a los servicios de firestore
+import 'registrar_planta.dart'; // import para registrar
+import 'editar_planta.dart'; // import para poder editar
 
 class Inicio extends StatelessWidget {
   Inicio({super.key});
@@ -50,6 +51,19 @@ class Inicio extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
+
+                  // para redirigir a editar_planta
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditarPlanta(
+                          planta: planta,
+                        ),
+                      ),
+                    );
+                  },
+
                   leading: const Icon(
                     Icons.local_florist,
                     color: Colors.green,
