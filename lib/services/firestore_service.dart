@@ -5,14 +5,19 @@ class FirestoreService {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> registrarPlanta(Planta planta) async {
-
+  Future<void> registrarPlanta(Planta planta) async { //creación de coleccion en el firebase
     await _db
-    //Crea una colección llamada plantas
         .collection("plantas")
-        .doc(planta.id) //crea doc
-        .set(planta.toMap()); // guarda info
+        .doc(planta.id)
+        .set(planta.toMap());
+  }
 
+  Stream<QuerySnapshot> obtenerPlantas() { //Llamar info de la firebase
+    return _db.collection("plantas").snapshots();
+  }
+
+  Future<void> eliminarPlanta(String id) async { //Funcion para eliminar plantas
+    await _db.collection("plantas").doc(id).delete();
   }
 
 }
