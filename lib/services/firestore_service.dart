@@ -20,4 +20,11 @@ class FirestoreService {
     await _db.collection("plantas").doc(id).delete();
   }
 
+  Future<void> actualizarPlanta(Planta planta) async { //Funcion para editar planta
+    await _db
+        .collection("plantas")
+        .doc(planta.id)
+        .update(planta.toMap());
+  }
+
 }
