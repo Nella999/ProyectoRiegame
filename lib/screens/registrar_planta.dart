@@ -63,7 +63,7 @@ class registrar_plantaState extends State<registrar_planta> {
               controller: frecuenciaController,
               keyboardType: TextInputType.number, // Se abre el teclado numerico
               decoration: const InputDecoration(
-                labelText: "Frecuencia de riego en días",
+                labelText: "Frecuencia de riego (días)",
                 border: OutlineInputBorder(),
               ),
             ),
