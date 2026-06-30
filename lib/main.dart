@@ -24,7 +24,7 @@ class RiegameApp extends StatelessWidget {
         colorSchemeSeed: Colors.green,
         useMaterial3: true,
       ),
-      home: const Inicio(),
+      home: Inicio(),
     );
   }
 }
