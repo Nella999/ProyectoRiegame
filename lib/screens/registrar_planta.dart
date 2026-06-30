@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/planta.dart';
+import '../providers/planta_provider.dart';
 
 class registrar_planta extends StatefulWidget {
   const registrar_planta({super.key});
@@ -66,15 +68,23 @@ class registrar_plantaState extends State<registrar_planta> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: () {
+                onPressed: () {
 
-                print("Nombre: ${nombreController.text}");
-                print("Apodo: ${apodoController.text}");
-                print("Observaciones: ${observacionesController.text}");
-                print("Frecuencia: ${frecuenciaController.text}");
+                  Planta nuevaPlanta = Planta(
+                    id: DateTime.now().toString(),
+                    nombre: nombreController.text,
+                    apodo: apodoController.text,
+                    observaciones: observacionesController.text,
+                    frecuenciaRiego: frecuenciaController.text,
+                  );
 
-              },
-              child: const Text("Guardar"),
+                  PlantaProvider.plantas.add(nuevaPlanta);
+
+                  print("Plantas registradas: ${PlantaProvider.plantas.length}");
+
+                  Navigator.pop(context);
+                },
+              child: const Text("Guardar Planta"),
             ),
 
           ],
