@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
 //import '../providers/planta_provider.dart'; ya no se hace uso de este import
-import '../services/firestore_service.dart';
+import '../viewmodels/planta_viewmodel.dart';
 
 class registrar_planta extends StatefulWidget {
   const registrar_planta({super.key});
@@ -16,7 +16,7 @@ class registrar_plantaState extends State<registrar_planta> {
   final apodoController = TextEditingController();
   final observacionesController = TextEditingController();
   final frecuenciaController = TextEditingController();
-  final FirestoreService firestoreService = FirestoreService(); // Agregando instancia de servicio
+  final PlantaViewModel viewModel = PlantaViewModel(); // Agregando instancia de servicio
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class registrar_plantaState extends State<registrar_planta> {
                   );
 
                   //PlantaProvider.plantas.add(newPlanta);
-                  await firestoreService.registrarPlanta(newPlanta); //esperar a que termine para continuar
+                  await viewModel.registrarPlanta(newPlanta); //esperar a que termine para continuar
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
