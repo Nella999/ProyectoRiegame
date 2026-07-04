@@ -51,6 +51,34 @@ class PlantaViewModel {
   /// Obtiene el historial de riegos de una planta.
   Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
     return _firestoreService.obtenerRiegos(plantaId);
-
   }
+  /// Calcula la fecha del próximo riego.
+  DateTime calcularProximoRiego(
+      DateTime ultimoRiego,
+      int frecuenciaDias,
+      ) {
+    return ultimoRiego.add(
+      Duration(days: frecuenciaDias),
+    );
+  }
+
+  Future<DateTime?> obtenerUltimoRiego(
+      String plantaId) {
+    return _firestoreService.obtenerUltimoRiego(
+      plantaId,
+    );
+  }
+  /// Indica si la planta necesita riego.
+  bool necesitaRiego(
+      DateTime ultimoRiego,
+      int frecuenciaDias,
+      ) {
+    final proximo =
+    calcularProximoRiego(
+      ultimoRiego,
+      frecuenciaDias,
+    );
+    return DateTime.now().isAfter(proximo);
+  }
+
 }

@@ -43,5 +43,22 @@ class FirestoreService {
         .orderBy("fecha", descending: true)
         .snapshots();
   }
+  Future<DateTime?> obtenerUltimoRiego(
+      String plantaId) async {
+
+    final consulta = await _db
+        .collection("riegos")
+        .where("plantaId", isEqualTo: plantaId)
+        .orderBy("fecha", descending: true)
+        .limit(1)
+        .get();
+
+    if (consulta.docs.isEmpty) {
+      return null;
+    }
+
+    return (consulta.docs.first["fecha"] as Timestamp)
+        .toDate();
+  }
 
 }
