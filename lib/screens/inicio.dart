@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; //Agregando imports
 import '../models/planta.dart';
-import '../services/firestore_service.dart'; // import para llamar a los servicios de firestore
+import '../viewmodels/planta_viewmodel.dart';
 import 'registrar_planta.dart'; // import para registrar
 import 'editar_planta.dart'; // import para poder editar
+import '../widgets/planta_card.dart';
 
-class Inicio extends StatelessWidget {
-  Inicio({super.key});
-  final FirestoreService firestoreService = FirestoreService();
+
+class Inicio extends StatefulWidget {
+  const Inicio({super.key});
+
+  @override
+  State<Inicio> createState() => _InicioState();
+}
+class _InicioState extends State<Inicio> {
+  final PlantaViewModel viewModel = PlantaViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -16,89 +23,78 @@ class Inicio extends StatelessWidget {
         title: const Text("¡Riégame!"),
       ),
 
-      // Cuerpo pantalla
-      body: StreamBuilder<QuerySnapshot>(
-        stream: firestoreService.obtenerPlantas(),
-        builder: (context, snapshot) {
+      body: _buildListaPlantas(),
 
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("Ocurrió un error :("),
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      floatingActionButton: _buildBotonAgregar(context),
+    );
+  }
 
-          final plantas = snapshot.data!.docs;
-          if (plantas.isEmpty) {
-            return const Center(
-              child: Text(
-                "Aún no registraste ninguna planta 🌱",
-                style: TextStyle(fontSize: 18),
-              ),
-            );
-          }
-          //Se agrega automaticamente la planta dps de guardarse
-          return ListView.builder(
-            itemCount: plantas.length,
-            itemBuilder: (context, index) {
-              final planta = Planta.fromMap(
-                plantas[index].data() as Map<String, dynamic>,
-              );
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: ListTile(
+  @override
+  Widget _buildListaPlantas() { //Creando lista de plantas
+    return StreamBuilder<QuerySnapshot>(
+      stream: viewModel.obtenerPlantas(),
+      builder: (context, snapshot) {
 
-                  // para redirigir a editar_planta
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EditarPlanta(
-                          planta: planta,
-                        ),
-                      ),
-                    );
-                  },
-
-                  leading: const Icon(
-                    Icons.local_florist,
-                    color: Colors.green,
-                  ),
-                  title: Text(planta.nombre),
-                  subtitle: Text(
-                    "Apodo: ${planta.apodo}\n"
-                        "💧 Cada ${planta.frecuenciaDias} días",
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                    onPressed: () async {
-                      await firestoreService.eliminarPlanta(planta.id);
-                    },
-                  ),
-                ),
-              );
-            },
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Ocurrió un error"),
           );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const registrar_planta(),
+        }
+
+        if (snapshot.connectionState ==
+            ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final plantas = snapshot.data!.docs;
+
+        if (plantas.isEmpty) {
+          return const Center(
+            child: Text(
+              "Aún no registraste ninguna planta 🌱",
             ),
           );
-        },
-        child: const Icon(Icons.add),
-      ),
+        }
+
+        return ListView.builder(
+          itemCount: plantas.length,
+          itemBuilder: (context, index) {
+            final planta = Planta.fromMap(
+              plantas[index].data()
+              as Map<String, dynamic>,
+            );
+
+            return PlantaCard(
+              planta: planta,
+              onDelete: () async {
+                await viewModel.eliminarPlanta(
+                  planta.id,
+                );
+              },
+
+              onTap: () {
+              },
+            );
+          },
+        );
+      },
+    );
+
+  }
+  Widget _buildBotonAgregar(BuildContext context) { // Borón para registrar planta
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+            const RegistrarPlanta(),
+          ),
+        );
+      },
+      child: const Icon(Icons.add),
     );
   }
 }
