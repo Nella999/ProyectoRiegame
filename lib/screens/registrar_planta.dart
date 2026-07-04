@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
-//import '../providers/planta_provider.dart'; ya no se hace uso de este import
 import '../viewmodels/planta_viewmodel.dart';
+import '../widgets/campo_texto.dart';
 
-class registrar_planta extends StatefulWidget {
-  const registrar_planta({super.key});
+class RegistrarPlanta extends StatefulWidget {
+  const RegistrarPlanta({super.key});
 
   @override
-  State<registrar_planta> createState() => registrar_plantaState();
+  State<RegistrarPlanta> createState() => RegistrarPlantaState();
 }
 
-class registrar_plantaState extends State<registrar_planta> {
+class RegistrarPlantaState extends State<RegistrarPlanta> {
 
   final nombreController = TextEditingController();
   final apodoController = TextEditingController();
   final observacionesController = TextEditingController();
   final frecuenciaController = TextEditingController();
-  final PlantaViewModel viewModel = PlantaViewModel(); // Agregando instancia de servicio
+  final PlantaViewModel viewModel = PlantaViewModel(); // ViewModel se encarga de comunicarse con Firestore
+
+  @override
+  void dispose() { //Para liberar memoria
+    nombreController.dispose();
+    apodoController.dispose();
+    observacionesController.dispose();
+    frecuenciaController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,61 +38,35 @@ class registrar_plantaState extends State<registrar_planta> {
         child: Column(
           children: [
 
-            TextField(
+            const SizedBox(height: 16),
+            CampoTexto(
               controller: nombreController,
-              decoration: const InputDecoration(
-                labelText: "Nombre de la planta",
-                border: OutlineInputBorder(),
-              ),
+              label: "Nombre de la planta",
             ),
-
             const SizedBox(height: 16),
 
-            TextField(
+            CampoTexto(
               controller: apodoController,
-              decoration: const InputDecoration(
-                labelText: "Apodo de la planta",
-                border: OutlineInputBorder(),
-              ),
+              label: "Apodo de la planta",
             ),
-
             const SizedBox(height: 16),
 
-            TextField(
+            CampoTexto(
               controller: observacionesController,
-              decoration: const InputDecoration(
-                labelText: "Observaciones",
-                border: OutlineInputBorder(),
-              ),
+              label: "Observaciones",
             ),
-
             const SizedBox(height: 16),
 
-            TextField(
+            CampoTexto(
               controller: frecuenciaController,
-              keyboardType: TextInputType.number, // Se abre el teclado numerico
-              decoration: const InputDecoration(
-                labelText: "Frecuencia de riego (días)",
-                border: OutlineInputBorder(),
-              ),
+              label: "Frecuencia de riego (días)",
+              keyboardType: TextInputType.number,
             ),
-
             const SizedBox(height: 20),
 
             ElevatedButton(
-                onPressed: () async  { //Acciones cuando el usuario selecciona algo
-
-                  //El usuario no puede dejar espacios vacíos
-                  if (nombreController.text.isEmpty || frecuenciaController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Completar los campos obligatorios porfavor"),
-                      ),
-                    );
-                    return;
-                  }
-
-                  Planta newPlanta = Planta(
+                onPressed: () async  { //Se ejecuta al presionar el boton guardar
+                  final newPlanta = Planta(
                     id: DateTime.now().millisecondsSinceEpoch.toString(),
                     nombre: nombreController.text,
                     apodo: apodoController.text,
@@ -92,14 +75,20 @@ class registrar_plantaState extends State<registrar_planta> {
                   );
 
                   //PlantaProvider.plantas.add(newPlanta);
-                  await viewModel.registrarPlanta(newPlanta); //esperar a que termine para continuar
-
+                  final resultado = await viewModel.registrarPlanta(newPlanta);
+                  if (resultado != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(resultado),
+                      ),
+                    );
+                    return;
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("¡Tu planta se registró correctamente! 🌱"),
                     ),
                   );
-
                   Navigator.pop(context);
                 },
               child: const Text("Guardar Planta"),
