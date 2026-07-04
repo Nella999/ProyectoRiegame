@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/planta.dart';
 import '../viewmodels/planta_viewmodel.dart';
 import 'editar_planta.dart';
+import '../services/notification_service.dart';
 
 class DetallePlanta extends StatelessWidget {
   final Planta planta;   // Planta que se mostrará en la pantalla
@@ -232,9 +233,12 @@ class DetallePlanta extends StatelessWidget {
                   icon: const Icon(Icons.water_drop),
                   label: const Text("Regué hoy"),
                   onPressed: () async {
-                    await viewModel.registrarRiego(
-                      planta.id,
+                    await viewModel.registrarRiego(planta.id,);
+                    await NotificationService().mostrarNotificacion(
+                      titulo: "¡Riégame! ☀️🌱",
+                      mensaje: "El riego de ${planta.nombre} fue registrado correctamente.",
                     );
+
                     ScaffoldMessenger.of(context)
                         .showSnackBar(
                       const SnackBar(
