@@ -5,6 +5,7 @@ import '../viewmodels/planta_viewmodel.dart';
 import 'registrar_planta.dart'; // import para registrar
 import 'editar_planta.dart'; // import para poder editar
 import '../widgets/planta_card.dart';
+import 'detalle_planta.dart';
 
 
 class Inicio extends StatefulWidget {
@@ -73,8 +74,15 @@ class _InicioState extends State<Inicio> {
                   planta.id,
                 );
               },
-
               onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetallePlanta(
+                      planta: planta,
+                    ),
+                  ),
+                );
               },
             );
           },
