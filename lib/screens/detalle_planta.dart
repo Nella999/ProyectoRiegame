@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
 import 'editar_planta.dart';
+import '../viewmodels/planta_viewmodel.dart';
 
 class DetallePlanta extends StatelessWidget {
   final Planta planta;
+  final PlantaViewModel viewModel = PlantaViewModel();
 
-  const DetallePlanta({
+   DetallePlanta({
     super.key,
     required this.planta,
   });
@@ -59,7 +61,7 @@ class DetallePlanta extends StatelessWidget {
             ),
             const Spacer(),
 
-            SizedBox(
+            SizedBox( //Boton para editar planta
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.edit),
@@ -74,6 +76,24 @@ class DetallePlanta extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(//Botón para registrar riego
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.water_drop),
+                label: const Text("Regué hoy"),
+                onPressed: () async {
+                  await viewModel.registrarRiego(planta.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("¡Riego registrado correctamente! 💧"),
+                    ),
+                  );
+
+                },
+
               ),
             ),
           ],

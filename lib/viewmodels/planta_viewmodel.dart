@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/planta.dart';
 import '../services/firestore_service.dart';
+import '../models/riego.dart';
 
 // ViewModel comunica la interfaz con Firestore.
 class PlantaViewModel {
@@ -38,4 +39,18 @@ class PlantaViewModel {
     await _firestoreService.actualizarPlanta(planta);
   }
 
+  /// Registra un nuevo riego para una planta.
+  Future<void> registrarRiego(String plantaId) async {
+    final nuevoRiego = Riego(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      plantaId: plantaId,
+      fecha: DateTime.now(),
+    );
+    await _firestoreService.registrarRiego(nuevoRiego);
+  }
+  /// Obtiene el historial de riegos de una planta.
+  Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
+    return _firestoreService.obtenerRiegos(plantaId);
+
+  }
 }
