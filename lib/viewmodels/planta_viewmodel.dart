@@ -1,15 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/planta.dart';
-import '../services/firestore_service.dart';
 import '../models/riego.dart';
+import '../services/firestore_service.dart';
+import '../utils/planta_utils.dart';
 
-// ViewModel comunica la interfaz con Firestore.
 class PlantaViewModel {
   final FirestoreService _firestoreService = FirestoreService();
-
-  // Valida y registra una nueva planta.
-  Future<String?> registrarPlanta(Planta planta) async {
-
+  Future<String?> registrarPlanta(Planta planta) async {  //Valida los datos y registra una nueva planta.
     if (planta.nombre.trim().isEmpty) {
       return "Debe ingresar el nombre de la planta.";
     }
@@ -19,28 +16,20 @@ class PlantaViewModel {
     try {
       await _firestoreService.registrarPlanta(planta);
       return null;
-    } catch (e) {
+    } catch (_) {
       return "Ocurrió un error al registrar la planta.";
     }
   }
-
-  // Obtiene todas las plantas en tiempo real
-  Stream<QuerySnapshot> obtenerPlantas() {
+  Stream<QuerySnapshot> obtenerPlantas() {  //Obtiene todas las plantas en tiempo real.
     return _firestoreService.obtenerPlantas();
   }
-
-  //Elimina una planta
-  Future<void> eliminarPlanta(String id) async {
-    await _firestoreService.eliminarPlanta(id);
-  }
-
-  //Actualiza una planta existente
-  Future<void> actualizarPlanta(Planta planta) async {
+  Future<void> actualizarPlanta(Planta planta) async {  //Actualiza una planta existente.
     await _firestoreService.actualizarPlanta(planta);
   }
-
-  //Registra un nuevo riego para una planta.
-  Future<void> registrarRiego(String plantaId) async {
+  Future<void> eliminarPlanta(String id) async {  //Elimina una planta.
+    await _firestoreService.eliminarPlanta(id);
+  }
+  Future<void> registrarRiego(String plantaId) async {//Registra un nuevo riego para una planta.
     final nuevoRiego = Riego(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       plantaId: plantaId,
@@ -48,47 +37,62 @@ class PlantaViewModel {
     );
     await _firestoreService.registrarRiego(nuevoRiego);
   }
-  //Obtiene el historial de riegos de una planta.
-  Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
+  Stream<QuerySnapshot> obtenerRiegos(String plantaId) {  //Obtiene el historial de riegos de una planta.
     return _firestoreService.obtenerRiegos(plantaId);
   }
-  //Calcula la fecha del próximo riego.
-  DateTime calcularProximoRiego(
-      DateTime ultimoRiego,
-      int frecuenciaDias,
-      ) {
-    return ultimoRiego.add(
-      Duration(days: frecuenciaDias),
-    );
+  Future<DateTime?> obtenerUltimoRiego(String plantaId) {  //Obtiene la fecha del último riego registrado.
+    return _firestoreService.obtenerUltimoRiego(plantaId);
   }
 
-  Future<DateTime?> obtenerUltimoRiego(
-      String plantaId) {
-    return _firestoreService.obtenerUltimoRiego(
-      plantaId,
-    );
-  }
-  //Indica si la planta necesita riego.
-  bool necesitaRiego(
+  DateTime calcularProximoRiego(  //Calcula la fecha del próximo riego.
       DateTime ultimoRiego,
       int frecuenciaDias,
       ) {
-    final proximo =
-    calcularProximoRiego(
+    return PlantaUtils.calcularProximoRiego(
       ultimoRiego,
       frecuenciaDias,
     );
-    return DateTime.now().isAfter(proximo);
+  }
+  bool necesitaRiego(  //Indica si una planta necesita ser regada.
+      DateTime ultimoRiego,
+      int frecuenciaDias,
+      ) {
+    return PlantaUtils.necesitaRiego(
+      ultimoRiego,
+      frecuenciaDias,
+    );
   }
 
-  //Devuelve la cantidad total de plantas.
-  Future<int> obtenerCantidadPlantas() {
+  Future<int> obtenerCantidadPlantas() {  //Devuelve la cantidad total de plantas registradas.
     return _firestoreService.obtenerCantidadPlantas();
   }
-
-  //Devuelve la cantidad total de riegos.
-  Future<int> obtenerCantidadRiegos() {
+  Future<int> obtenerCantidadRiegos() {  //Devuelve la cantidad total de riegos registrados.
     return _firestoreService.obtenerCantidadRiegos();
   }
-
+  Future<int> obtenerPlantasQueNecesitanRiego() async {  //Cuenta cuántas plantas necesitan riego actualmente.
+    int contador = 0;
+    final plantasSnapshot =
+    await _firestoreService.obtenerTodasLasPlantas();
+    for (final documento in plantasSnapshot.docs) {
+      final planta = Planta.fromMap(
+        documento.data() as Map<String, dynamic>,
+      );
+      final ultimoRiego =
+      await _firestoreService.obtenerUltimoRiego(
+        planta.id,
+      );
+      // Si nunca fue regada, se considera que necesita riego.
+      if (ultimoRiego == null) {
+        contador++;
+        continue;
+      }
+      if (necesitaRiego(
+        ultimoRiego,
+        planta.frecuenciaDias,
+      )) {
+        contador++;
+      }
+    }
+    return contador;
+  }
 }

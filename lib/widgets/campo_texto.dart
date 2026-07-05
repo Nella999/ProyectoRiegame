@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//Campo de texto reutilizable para los formularios de la aplicación.
 class CampoTexto extends StatelessWidget {
 
   final TextEditingController controller;

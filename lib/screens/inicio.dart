@@ -3,9 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart'; //Agregando imports
 import '../models/planta.dart';
 import '../viewmodels/planta_viewmodel.dart';
 import 'registrar_planta.dart'; // import para registrar
-import 'editar_planta.dart'; // import para poder editar
 import '../widgets/planta_card.dart';
 import 'detalle_planta.dart';
+import '../widgets/bienvenida_card.dart';
+import '../widgets/estadisticas_card.dart';
 
 
 class Inicio extends StatefulWidget {
@@ -17,6 +18,7 @@ class Inicio extends StatefulWidget {
 class _InicioState extends State<Inicio> {
   final PlantaViewModel viewModel = PlantaViewModel();
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -25,45 +27,11 @@ class _InicioState extends State<Inicio> {
 
       body: Column(
         children: [
-          Card( // Tarjeta de bienvenida
-            margin: const EdgeInsets.all(16),
-            elevation: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.local_florist,
-                    color: Colors.green,
-                    size: 45,
-                  ),
-                  const SizedBox(width: 15),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: const [
-
-                        Text(
-                          "¡Bienvenido a Riégame!",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-
-                        Text(
-                          "Administra el riego de todas tus plantas de manera sencilla.",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const BienvenidaCard(),
+          EstadisticasCard(
+            viewModel: viewModel,
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: _buildListaPlantas(),
           ),
@@ -72,7 +40,6 @@ class _InicioState extends State<Inicio> {
       floatingActionButton: _buildBotonAgregar(context),
     );
   }
-  @override
   Widget _buildListaPlantas() { //Creando lista de plantas
     return StreamBuilder<QuerySnapshot>(
       stream: viewModel.obtenerPlantas(),
@@ -90,9 +57,7 @@ class _InicioState extends State<Inicio> {
             child: CircularProgressIndicator(),
           );
         }
-
         final plantas = snapshot.data!.docs;
-
         if (plantas.isEmpty) {
           return const Center(
             child: Text(
@@ -100,7 +65,6 @@ class _InicioState extends State<Inicio> {
             ),
           );
         }
-
         return ListView.builder(
           itemCount: plantas.length,
           itemBuilder: (context, index) {
@@ -108,14 +72,45 @@ class _InicioState extends State<Inicio> {
               plantas[index].data()
               as Map<String, dynamic>,
             );
-
             return PlantaCard(
               planta: planta,
-              onDelete: () async {
-                await viewModel.eliminarPlanta(
-                  planta.id,
-                );
-              },
+                onDelete: () async { //confirmación de eliminar
+                  final confirmar = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Eliminar planta"),
+                        content: Text(
+                          "¿Deseas eliminar '${planta.nombre}'?\n\nEsta acción no se puede deshacer.",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, false);
+                            },
+                            child: const Text("Cancelar"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context, true);
+                            },
+                            child: const Text("Eliminar"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  if (confirmar == true) {
+                    await viewModel.eliminarPlanta(planta.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "${planta.nombre} fue eliminada.",
+                        ),
+                      ),
+                    );
+                  }
+                },
               onTap: () {
                 Navigator.push(
                   context,
@@ -133,7 +128,7 @@ class _InicioState extends State<Inicio> {
     );
 
   }
-  Widget _buildBotonAgregar(BuildContext context) { // Borón para registrar planta
+  Widget _buildBotonAgregar(BuildContext context) { // Botón para registrar planta
     return FloatingActionButton(
       onPressed: () {
         Navigator.push(

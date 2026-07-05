@@ -6,7 +6,7 @@ import 'editar_planta.dart';
 import '../services/notification_service.dart';
 
 class DetallePlanta extends StatelessWidget {
-  final Planta planta;   // Planta que se mostrará en la pantalla
+  final Planta planta;
   final PlantaViewModel viewModel = PlantaViewModel();
 
   DetallePlanta({
@@ -25,7 +25,6 @@ class DetallePlanta extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         }
-
         // En caso de errores
         if (snapshot.hasError) {
           return const Text(
@@ -38,7 +37,6 @@ class DetallePlanta extends StatelessWidget {
             "Aún no hay riegos registrados.",
           );
         }
-
         final riegos = snapshot.data!.docs;
         // Se muestran todos los riegos registrados
         return Column(
@@ -65,14 +63,13 @@ class DetallePlanta extends StatelessWidget {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(planta.nombre),
       ),
-      body: SingleChildScrollView(//Desplazamiento por la ventana
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -89,7 +86,7 @@ class DetallePlanta extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              //información general
+              //información general de la planta
               Text(
                 "Nombre",
                 style: Theme.of(context).textTheme.titleMedium,
@@ -120,7 +117,7 @@ class DetallePlanta extends StatelessWidget {
               ),
               const SizedBox(height: 25),
 
-              //Proximo riego
+              //Información de riego
               FutureBuilder<DateTime?>(
                 future: viewModel.obtenerUltimoRiego(planta.id),
                 builder: (context, snapshot) {
@@ -197,7 +194,7 @@ class DetallePlanta extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 30),
-              const Divider(),//historial
+              const Divider(),//historial de riegos
               const SizedBox(height: 15),
               Text(
                 "Historial de riegos",
@@ -208,7 +205,7 @@ class DetallePlanta extends StatelessWidget {
               _buildHistorialRiegos(),
               const SizedBox(height: 30),
 
-              SizedBox(//boton editar
+              SizedBox(//boton para editar la planta
               width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.edit),
@@ -227,7 +224,7 @@ class DetallePlanta extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              SizedBox(//boton para registrar riego
+              SizedBox(//boton para registrar un nuevo riego
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.water_drop),

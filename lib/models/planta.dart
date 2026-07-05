@@ -1,19 +1,18 @@
 class Planta {
-  //Detallando la info registrada
-  final String id;
-  final String nombre;
-  final String apodo;
-  final String observaciones;
-  final int frecuenciaDias;
+  final String id;  //Identificador  de la planta.
+  final String nombre;  //Nombre de la planta.
+  final String apodo;  //Apodo asignado por el usuario.
+  final String observaciones;//Observaciones adicionales
+  final int frecuenciaDias;//Frecuencia de riego en días.
 
   Planta({
     required this.id,
     required this.nombre,
     required this.apodo,
     required this.observaciones,
-  required this.frecuenciaDias,
+    required this.frecuenciaDias,
   });
-  //Agregando map para que Firestore pueda leerlo
+  //Convierte el objeto Planta en un Map para Firestore.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -23,8 +22,7 @@ class Planta {
       'frecuenciaDias': frecuenciaDias,
     };
   }
-
-  // Convierte un doc de Firestore en un objeto Planta
+  /// Crea una instancia de Planta desde un documento de Firestore.
   factory Planta.fromMap(Map<String, dynamic> map) {
     return Planta(
       id: map['id'] ?? '',

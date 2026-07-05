@@ -16,7 +16,7 @@ class RegistrarPlantaState extends State<RegistrarPlanta> {
   final apodoController = TextEditingController();
   final observacionesController = TextEditingController();
   final frecuenciaController = TextEditingController();
-  final PlantaViewModel viewModel = PlantaViewModel(); // ViewModel se encarga de comunicarse con Firestore
+  final PlantaViewModel viewModel = PlantaViewModel();
 
   @override
   void dispose() { //Para liberar memoria
@@ -74,7 +74,6 @@ class RegistrarPlantaState extends State<RegistrarPlanta> {
                     frecuenciaDias: int.tryParse(frecuenciaController.text) ?? 0, //Modificando el tipo de dato a entero
                   );
 
-                  //PlantaProvider.plantas.add(newPlanta);
                   final resultado = await viewModel.registrarPlanta(newPlanta);
                   if (resultado != null) {
                     ScaffoldMessenger.of(context).showSnackBar(

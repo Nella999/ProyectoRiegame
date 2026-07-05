@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
-import '../services/firestore_service.dart';
 import '../viewmodels/planta_viewmodel.dart';
 
 class EditarPlanta extends StatefulWidget {
   final Planta planta;
-  // constructor para editar
   const EditarPlanta({
     super.key,
     required this.planta,
@@ -31,6 +29,15 @@ class _EditarPlantaState extends State<EditarPlanta> {
     observacionesController.text = widget.planta.observaciones;
     frecuenciaController.text =
         widget.planta.frecuenciaDias.toString();
+  }
+
+  @override
+  void dispose() {
+    nombreController.dispose();
+    apodoController.dispose();
+    observacionesController.dispose();
+    frecuenciaController.dispose();
+    super.dispose();
   }
 
   @override

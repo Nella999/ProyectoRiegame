@@ -1,18 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'screens/inicio.dart';
 import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  await NotificationService.instance.init(); //inicializa las notificaciones
-  await NotificationService.instance.solicitarPermiso(); //Solicita permiso para las notificaciones
+  await NotificationService.instance.init();
+  await NotificationService.instance.solicitarPermiso();
   runApp(const RiegameApp());
 }
 class RiegameApp extends StatelessWidget {
@@ -27,7 +25,7 @@ class RiegameApp extends StatelessWidget {
         colorSchemeSeed: Colors.green,
         useMaterial3: true,
       ),
-      home: Inicio(),
+      home: const Inicio(),
     );
   }
 }
