@@ -27,7 +27,7 @@ class FirestoreService {
         .doc(planta.id)
         .update(planta.toMap());
   }
-  /// Registra un nuevo riego en Firestore.
+  //Registra un nuevo riego en Firestore.
   Future<void> registrarRiego(Riego riego) async {
     await _db
         .collection("riegos")
@@ -35,7 +35,7 @@ class FirestoreService {
         .set(riego.toMap());
   }
 
-  /// Obtiene todos los riegos de una planta.
+  // Obtiene todos los riegos de una planta.
   Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
     return _db
         .collection("riegos")
@@ -60,5 +60,15 @@ class FirestoreService {
     return (consulta.docs.first["fecha"] as Timestamp)
         .toDate();
   }
+  //Obtiene la cantidad total de plantas.
+  Future<int> obtenerCantidadPlantas() async {
+    final consulta = await _db.collection("plantas").get();
+    return consulta.docs.length;
+  }
 
+  // Obtiene la cantidad total de riegos.
+  Future<int> obtenerCantidadRiegos() async {
+    final consulta = await _db.collection("riegos").get();
+    return consulta.docs.length;
+  }
 }

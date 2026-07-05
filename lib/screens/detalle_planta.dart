@@ -234,7 +234,7 @@ class DetallePlanta extends StatelessWidget {
                   label: const Text("Regué hoy"),
                   onPressed: () async {
                     await viewModel.registrarRiego(planta.id,);
-                    await NotificationService().mostrarNotificacion(
+                    await NotificationService.instance.mostrarNotificacion(
                       titulo: "¡Riégame! ☀️🌱",
                       mensaje: "El riego de ${planta.nombre} fue registrado correctamente.",
                     );

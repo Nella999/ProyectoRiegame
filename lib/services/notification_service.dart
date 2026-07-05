@@ -1,35 +1,41 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// Servicio encargado de mostrar notificaciones locales.
 class NotificationService {
+  NotificationService._();
+  static final NotificationService instance =
+  NotificationService._();
 
   final FlutterLocalNotificationsPlugin notificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  /// Inicializa las notificaciones.
+  // Inicializa las notificaciones
   Future<void> init() async {
-
-    const AndroidInitializationSettings androidSettings =
+    const androidSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-    InitializationSettings(
+    const settings = InitializationSettings(
       android: androidSettings,
     );
-
     await notificationsPlugin.initialize(
-      settings: initializationSettings,
+      settings: settings,
     );
   }
 
-  /// Muestra una notificación inmediata.
+  //Solicita permiso (Android 13+)
+  Future<void> solicitarPermiso() async {
+    await notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+  }
+
+  // Muestra una notificación
   Future<void> mostrarNotificacion({
     required String titulo,
     required String mensaje,
   }) async {
 
-    const AndroidNotificationDetails androidDetails =
-    AndroidNotificationDetails(
+    print("Entró a mostrarNotificacion");
+    const androidDetails = AndroidNotificationDetails(
       'riegame_channel',
       'Recordatorios',
       channelDescription: 'Recordatorios de riego',
@@ -37,8 +43,7 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const NotificationDetails notificationDetails =
-    NotificationDetails(
+    const notificationDetails = NotificationDetails(
       android: androidDetails,
     );
 
@@ -48,5 +53,7 @@ class NotificationService {
       body: mensaje,
       notificationDetails: notificationDetails,
     );
+
+    print("Notificación enviada");
   }
 }

@@ -17,19 +17,61 @@ class Inicio extends StatefulWidget {
 class _InicioState extends State<Inicio> {
   final PlantaViewModel viewModel = PlantaViewModel();
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("¡Riégame!"),
       ),
 
-      body: _buildListaPlantas(),
+      body: Column(
+        children: [
+          Card( // Tarjeta de bienvenida
+            margin: const EdgeInsets.all(16),
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.local_florist,
+                    color: Colors.green,
+                    size: 45,
+                  ),
+                  const SizedBox(width: 15),
 
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                      children: const [
+
+                        Text(
+                          "¡Bienvenido a Riégame!",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+
+                        Text(
+                          "Administra el riego de todas tus plantas de manera sencilla.",
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: _buildListaPlantas(),
+          ),
+        ],
+      ),
       floatingActionButton: _buildBotonAgregar(context),
     );
   }
-
   @override
   Widget _buildListaPlantas() { //Creando lista de plantas
     return StreamBuilder<QuerySnapshot>(

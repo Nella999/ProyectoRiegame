@@ -29,17 +29,17 @@ class PlantaViewModel {
     return _firestoreService.obtenerPlantas();
   }
 
-  /// Elimina una planta
+  //Elimina una planta
   Future<void> eliminarPlanta(String id) async {
     await _firestoreService.eliminarPlanta(id);
   }
 
-  /// Actualiza una planta existente
+  //Actualiza una planta existente
   Future<void> actualizarPlanta(Planta planta) async {
     await _firestoreService.actualizarPlanta(planta);
   }
 
-  /// Registra un nuevo riego para una planta.
+  //Registra un nuevo riego para una planta.
   Future<void> registrarRiego(String plantaId) async {
     final nuevoRiego = Riego(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -48,11 +48,11 @@ class PlantaViewModel {
     );
     await _firestoreService.registrarRiego(nuevoRiego);
   }
-  /// Obtiene el historial de riegos de una planta.
+  //Obtiene el historial de riegos de una planta.
   Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
     return _firestoreService.obtenerRiegos(plantaId);
   }
-  /// Calcula la fecha del próximo riego.
+  //Calcula la fecha del próximo riego.
   DateTime calcularProximoRiego(
       DateTime ultimoRiego,
       int frecuenciaDias,
@@ -68,7 +68,7 @@ class PlantaViewModel {
       plantaId,
     );
   }
-  /// Indica si la planta necesita riego.
+  //Indica si la planta necesita riego.
   bool necesitaRiego(
       DateTime ultimoRiego,
       int frecuenciaDias,
@@ -79,6 +79,16 @@ class PlantaViewModel {
       frecuenciaDias,
     );
     return DateTime.now().isAfter(proximo);
+  }
+
+  //Devuelve la cantidad total de plantas.
+  Future<int> obtenerCantidadPlantas() {
+    return _firestoreService.obtenerCantidadPlantas();
+  }
+
+  //Devuelve la cantidad total de riegos.
+  Future<int> obtenerCantidadRiegos() {
+    return _firestoreService.obtenerCantidadRiegos();
   }
 
 }

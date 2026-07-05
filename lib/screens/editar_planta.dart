@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/planta.dart';
 import '../services/firestore_service.dart';
+import '../viewmodels/planta_viewmodel.dart';
 
 class EditarPlanta extends StatefulWidget {
   final Planta planta;
@@ -19,7 +20,7 @@ class _EditarPlantaState extends State<EditarPlanta> {
   final apodoController = TextEditingController();
   final observacionesController = TextEditingController();
   final frecuenciaController = TextEditingController();
-  final firestoreService = FirestoreService();
+  final viewModel = PlantaViewModel();
 
   @override
   void initState() {
@@ -100,8 +101,7 @@ class _EditarPlantaState extends State<EditarPlanta> {
                       int.tryParse(frecuenciaController.text) ?? 0,
                     );
 
-                    await firestoreService.actualizarPlanta(plantaActualizada); // Aparece la planta actualizada despues de darle a guardar
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    await viewModel.actualizarPlanta(plantaActualizada);                    ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Se actualizó tu planta correctamente 🌱"),
                       ),

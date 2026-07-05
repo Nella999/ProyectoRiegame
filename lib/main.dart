@@ -11,7 +11,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await NotificationService().init(); //inicializa las notificaciones
+  await NotificationService.instance.init(); //inicializa las notificaciones
+  await NotificationService.instance.solicitarPermiso(); //Solicita permiso para las notificaciones
   runApp(const RiegameApp());
 }
 class RiegameApp extends StatelessWidget {
