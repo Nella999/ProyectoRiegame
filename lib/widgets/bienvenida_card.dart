@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//Tarjeta de bienvenida que se muestra en la pantalla principal.
 class BienvenidaCard extends StatelessWidget {
   const BienvenidaCard({super.key});
 
@@ -8,6 +7,7 @@ class BienvenidaCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(16),
       elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
@@ -32,6 +32,7 @@ class BienvenidaCard extends StatelessWidget {
                   SizedBox(height: 6),
                   Text(
                     "Administra el riego de todas tus plantas de manera sencilla.",
+                    style: TextStyle(color: Colors.grey),
                   ),
                 ],
               ),

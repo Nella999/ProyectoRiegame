@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "900933622312",
+    "project_id": "riegameapp-4d5b7",
+    "storage_bucket": "riegameapp-4d5b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900933622312:android:eebf70e96e799133f2331d",
+        "android_client_info": {
+          "package_name": "com.example.riegame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEbCXpw-v5RH5U9UK-SNgbC3B8w-J72Jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900933622312:android:1d9d6434b9426965f2331d",
+        "android_client_info": {
+          "package_name": "com.nella.riegame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEbCXpw-v5RH5U9UK-SNgbC3B8w-J72Jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-//Campo de texto reutilizable para los formularios de la aplicación.
-class CampoTexto extends StatelessWidget {
 
-  final TextEditingController controller;
-  final String label;
-  final TextInputType keyboardType;
+/// Un widget de campo de texto personalizado y reutilizable.
+class CampoTexto extends StatelessWidget {
+  final TextEditingController controller; // Controlador para manejar el valor del texto.
+  final String label;                      // Etiqueta que se muestra sobre el campo.
+  final TextInputType keyboardType;        // Tipo de teclado
 
   const CampoTexto({
     super.key,
@@ -23,6 +23,7 @@ class CampoTexto extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
+          // Se puede añadir más estilo aquí (iconos, colores, etc.)
         ),
       ),
     );
