@@ -10,6 +10,7 @@ import '../widgets/estadisticas_card.dart';
 import 'consulta_ia.dart';
 
 //Pantalla principal de la aplicación.
+//Muestra un resumen de estadísticas del jardín y la lista de plantas registradas.
 class Inicio extends StatefulWidget {
   const Inicio({super.key});
 
@@ -18,7 +19,7 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
-  // Instancia del ViewModel para gestionar la lógica de las plantas.
+  //Instancia del ViewModel para gestionar la lógica de negocio y comunicación con Firestore.
   final PlantaViewModel viewModel = PlantaViewModel();
 
   @override
@@ -27,7 +28,7 @@ class _InicioState extends State<Inicio> {
       appBar: AppBar(
         title: const Text("¡Riégame!"),
         actions: [
-          // Botón para navegar a la consulta IA
+          //Botón para navegar a la consulta con Inteligencia Artificial (Gemini).
           IconButton(
             icon: const Icon(Icons.smart_toy),
             tooltip: "Consultar IA",
@@ -45,25 +46,29 @@ class _InicioState extends State<Inicio> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Card de bienvenida.
+            //Card decorativo que da la bienvenida al usuario.
             const BienvenidaCard(),
-            // Card que muestra métricas globales
+            
+            //Dashboard que muestra métricas globales (plantas, riegos y alertas).
             EstadisticasCard(
               viewModel: viewModel,
             ),
+            
             const SizedBox(height: 15),
-            // Sección de la lista de plantas.
+            
+            //Sección que renderiza la lista de plantas escuchando cambios en tiempo real.
             _buildListaPlantas(),
-            const SizedBox(height: 100),
+            
+            const SizedBox(height: 100), // Espacio de seguridad para el botón flotante.
           ],
         ),
       ),
-      // Botón flotante para registrar nuevas plantas.
+      //Botón flotante para registrar nuevas integrantes al jardín.
       floatingActionButton: _buildBotonAgregar(context),
     );
   }
 
-  //Construye la lista de plantas escuchando los cambios en Firestore en tiempo real.
+  //Construye la lista de plantas utilizando un StreamBuilder para actualizaciones automáticas.
   Widget _buildListaPlantas() {
     return StreamBuilder<QuerySnapshot>(
       stream: viewModel.obtenerPlantas(),
@@ -81,7 +86,11 @@ class _InicioState extends State<Inicio> {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: Text("Aún no registraste ninguna planta 🌱", textAlign: TextAlign.center),
+              child: Text(
+                "Aún no registraste ninguna planta 🌱", 
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
           );
         }
@@ -91,14 +100,14 @@ class _InicioState extends State<Inicio> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: plantasDocs.length,
           itemBuilder: (context, index) {
-            // De documento Firestore a modelo Planta.
+            //Mapeo del documento de Firestore al modelo de datos Planta.
             final planta = Planta.fromMap(
               plantasDocs[index].data() as Map<String, dynamic>,
             );
 
             return PlantaCard(
               planta: planta,
-              // Lógica para eliminar una planta con confirmación previa.
+              //Lógica de eliminación con confirmación y limpieza de registros relacionados.
               onDelete: () async {
                 final confirmar = await showDialog<bool>(
                   context: context,
@@ -106,7 +115,7 @@ class _InicioState extends State<Inicio> {
                     return AlertDialog(
                       title: const Text("Eliminar planta"),
                       content: Text(
-                        "¿Deseas eliminar '${planta.nombre}'?\n\nEsta acción borrará todos sus riegos y registros.",
+                        "¿Deseas eliminar '${planta.nombre}'?\n\nEsta acción borrará todos sus riegos y registros de forma permanente.",
                       ),
                       actions: [
                         TextButton(
@@ -115,6 +124,10 @@ class _InicioState extends State<Inicio> {
                         ),
                         ElevatedButton(
                           onPressed: () => Navigator.pop(context, true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade50, 
+                            foregroundColor: Colors.red
+                          ),
                           child: const Text("Eliminar"),
                         ),
                       ],
@@ -124,13 +137,13 @@ class _InicioState extends State<Inicio> {
 
                 if (confirmar == true) {
                   await viewModel.eliminarPlanta(planta.id);
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("${planta.nombre} fue eliminada.")),
+                    SnackBar(content: Text("${planta.nombre} fue eliminada del jardín.")),
                   );
                 }
               },
-              // Navegación al detalle de la planta al tocar el card.
+              //Navegación a la pantalla de detalles al tocar la tarjeta.
               onTap: () {
                 Navigator.push(
                   context,
@@ -146,7 +159,10 @@ class _InicioState extends State<Inicio> {
     );
   }
 
-  //Construye el botón flotante de agregar.
+
+
+
+  //Construye el botón circular flotante para agregar plantas.
   Widget _buildBotonAgregar(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {

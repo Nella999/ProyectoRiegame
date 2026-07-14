@@ -4,6 +4,7 @@ import '../models/riego.dart';
 import '../models/horas_sol.dart';
 
 //Servicio encargado de la comunicación directa con Firebase Firestore.
+//Centraliza todas las operaciones CRUD y las consultas a la base de datos.
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -15,7 +16,7 @@ class FirestoreService {
         .set(planta.toMap());
   }
 
-  //Obtiene un flujo de todas las plantas para actualizaciones en tiempo real.
+  //Obtiene un flujo (Stream) de todas las plantas para actualizaciones en tiempo real.
   Stream<QuerySnapshot> obtenerPlantas() {
     return _db.collection("plantas").snapshots();
   }
@@ -28,11 +29,16 @@ class FirestoreService {
         .update(planta.toMap());
   }
 
-  //Elimina una planta y todos sus datos relacionados
+  //Elimina una planta y todos sus datos relacionados (riegos y horas de sol)
+  //utilizando un [WriteBatch] para asegurar la atomicidad de la operación.
   Future<void> eliminarPlanta(String id) async {
     final batch = _db.batch();
+
+    // 1. Referencia a la planta principal
     final plantaRef = _db.collection("plantas").doc(id);
     batch.delete(plantaRef);
+
+    // 2. Buscar y agregar al lote todos los riegos de esta planta
     final riegos = await _db
         .collection("riegos")
         .where("plantaId", isEqualTo: id)
@@ -40,6 +46,8 @@ class FirestoreService {
     for (var doc in riegos.docs) {
       batch.delete(doc.reference);
     }
+
+    // 3. Buscar y agregar al lote todos los registros de horas de sol
     final horas = await _db
         .collection("horas_sol")
         .where("plantaId", isEqualTo: id)
@@ -48,10 +56,11 @@ class FirestoreService {
       batch.delete(doc.reference);
     }
 
-    // Ejecutar todas las eliminaciones
+    // Ejecutar todas las eliminaciones en una sola operación atómica.
     await batch.commit();
   }
 
+  //Obtiene una captura única de todas las plantas registradas.
   Future<QuerySnapshot> obtenerTodasLasPlantas() async {
     return await _db.collection("plantas").get();
   }
@@ -62,7 +71,7 @@ class FirestoreService {
     return consulta.docs.length;
   }
 
-  /// Registra un nuevo evento de riego en la colección "riegos".
+  //Registra un nuevo evento de riego en la colección "riegos".
   Future<void> registrarRiego(Riego riego) async {
     await _db
         .collection("riegos")
@@ -70,7 +79,7 @@ class FirestoreService {
         .set(riego.toMap());
   }
 
-  /// Obtiene un Stream de los riegos de una planta específica, ordenados por fecha.
+  //Obtiene un Stream de los riegos de una planta específica.
   Stream<QuerySnapshot> obtenerRiegos(String plantaId) {
     return _db
         .collection("riegos")
@@ -78,7 +87,7 @@ class FirestoreService {
         .snapshots();
   }
 
-  /// Recupera la fecha del último riego registrado para una planta.
+  //Recupera la fecha del último riego registrado para una planta.
   Future<DateTime?> obtenerUltimoRiego(String plantaId) async {
     final consulta = await _db
         .collection("riegos")
@@ -108,15 +117,15 @@ class FirestoreService {
         .collection("riegos")
         .where("plantaId", isEqualTo: plantaId)
         .get();
-
     return consulta.docs.length;
   }
 
+  //Alias para obtener el total de riegos de una planta.
   Future<int> obtenerTotalRiegosPlanta(String plantaId) async {
     return obtenerCantidadRiegosPlanta(plantaId);
   }
 
-  /// Cuenta los riegos de una planta en los últimos 7 días.
+  //Cuenta los riegos de una planta en los últimos 7 días.
   Future<int> obtenerRiegosSemana(String plantaId) async {
     final hace7Dias = DateTime.now().subtract(const Duration(days: 7));
     final consulta = await _db
